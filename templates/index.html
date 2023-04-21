@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <h1>{{ info.longName }}</h1>
+        <p>Symbol: {{ info.symbol }}</p>
+        <p>Bid: {{ info.bid }}</p>
+        <p>Ask: {{ info.ask }}</p>
+        <br>
+        <h2>Price History Details</h2>
+        <table>
+        <tr>
+            <th>Date</th>
+            <th>Open</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Close</th>
+            <th>Volume</th>
+        </tr>
+        {% for index, row in history.iterrows() %}
+        <tr>
+            <td>{{ index.strftime('%Y-%m-%d') }}</td>
+            <td>{{ row['Open'] }}</td>
+            <td>{{ row['High'] }}</td>
+            <td>{{ row['Low'] }}</td>
+            <td>{{ row['Close'] }}</td>
+            <td>{{ row['Volume'] }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endblock %}
