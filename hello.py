@@ -1,5 +1,6 @@
 from flask import Flask, render_template,request
 import yfinance as yf
+import time
 
 app = Flask(__name__)
 
@@ -21,23 +22,19 @@ def form():
 def process_form():
     ticker_symbol = request.form['tickerSymbol']
     pd = request.form['period']
-    checkFrequency=period = request.form['checkFrequency']
+
+    checkFrequency = request.form['checkFrequency']
     ask_threshold=request.form['ask']
     bid_threshold=request.form['bid']
 
-    gspc = yf.Ticker(ticker_symbol)
+    gspc_1 = yf.Ticker(ticker_symbol)
     # gspc=yf.Ticker("MSFT")
-    info = gspc.info
-    history = gspc.history(pd)
-
-    if gspc.info['bid']>=bid_threshold or gspc.info['ask'] >=ask_threshold:
-        print(gspc.info['bid'],gspc.info['ask'])
-    else:
-        print('Hasn\'t reached threshold')
+    info_1 = gspc_1.info
+    history_1 = gspc_1.history(pd)
     
     # do something with the data
     # return 'Received form data: ticker symbol={}, period={}, freq={}, ask_threshold={}, bid_threshold={}'.format(ticker_symbol, period,checkFrequency,ask_threshold,bid_threshold)
-    return render_template('index.html',info=info,history=history)
+    return render_template('index.html',info=info_1,history=history_1)
 
 if __name__ == '__main__':
-   app.run(debug=True)
+    app.run(debug=True)

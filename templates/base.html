@@ -9,10 +9,12 @@
 </head>
 <body>
     <div class="container">
-        <nav>
-            <a href="">Home</a>
-            <a href="">Form</a>
-        </nav>
+        <div class="nav">
+            <ul>
+              <li><a href="{{ url_for('index')}}">Home</a></li>
+                <li><a href="{{ url_for('form')}}">Form</a></li>
+            </ul>
+          </div>
         {% block content %}
         {% endblock %}
     </div>
