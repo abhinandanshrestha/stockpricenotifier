@@ -5,24 +5,28 @@ import threading
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import config
+import unit_test.config as config
+from twilio.rest import Client
 
 app = Flask(__name__)
 
-# for index page
+# Define initial parameters for index page
 gspc = yf.Ticker("META")
 period_="1mo"
 
-# for subscription
+# Define initial parameters for subscription
 gspc_1 = yf.Ticker("MSFT")
 checkFrequency=2
 ask_threshold=99999
 sub=''
+email=''
+sms=''
 
+# Function to handle sending email once currentPrice exceeds a threshold
 def sendMail():
     # Set up the email parameters
     sender = 'shtabhi@gmail.com'
-    receiver = 'pubjeegamer@gmail.com'
+    receiver = email
     password = config.PASSWORD
     subject = 'Email regarding increase in price of stock beyong your stated Threshold'
 
@@ -49,8 +53,22 @@ def sendMail():
     # Close the SMTP server
     smtp_server.quit()
 
+
+# Function to handle sending sms once currentPrice exceeds a threshold
 def sendSms():
-    pass
+    account_sid = config.account_sid
+    auth_token = config.auth_token
+    client = Client(account_sid, auth_token)
+
+    message = client.messages \
+                    .create(
+                        body="Stock Price Increased to ",
+                        from_='+15672293064',
+                        to=sms
+                    )
+
+    print(message.sid+" Message sent")
+
 
 @app.route('/')
 def index():
@@ -91,6 +109,12 @@ def process_form():
 
     global sub
     sub=request.form['sub']
+
+    global sms
+    sms=request.form['sms']
+
+    global email
+    email=request.form['email']
 
     thread = threading.Thread(target=background_thread)
     thread.start()

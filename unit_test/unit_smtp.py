@@ -1,7 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import config
+import unit_test.config as config
 
 # Set up the email parameters
 sender = 'shtabhi@gmail.com'

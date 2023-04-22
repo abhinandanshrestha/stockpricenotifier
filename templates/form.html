@@ -1,26 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<br><br><br>
-        <h2>Please enter details:</h1>
+<br><br>
+<br>
+        <h3>Enter your details to get notified once the price of stock increases:</h3>
         <br>
         <form method="POST" action="{{ url_for('process_form') }}">
             <label for="tickerSymbol">Ticker Symbol:</label>
             <input type="text" id="tickerSymbol" name="tickerSymbol">
 
-            <!-- <label for="period">Period:</label>
-            <select id="period" name="period">
-                <option value="1d">1 day</option>
-                <option value="4d">4 days</option>
-                <option value="7d">7 days</option>
-                <option value="1mo">1 month</option>
-                <option value="2mo">2 month</option>
-                <option value="3mo">3 month</option>
-                <option value="6mo">6 month</option>
-                <option value="1y">1 year</option>
-                <option value="2y">2 year</option>
-            </select> -->
-            
             <label for="checkFrequency">How frequently to check for price changes?:</label>
                 <select id="period" name="period">
                     <option value="5">Every 5 second</option>
@@ -32,7 +20,12 @@
             <label for="ask">At what price did you buy? (or Threshold):</label>
                 <input type="text" id="ask" name="ask">
 
+            <label for="email">Email:</label>
+                <input type="text" id="email" name="email">
 
+            <label for="sms">Mobile Number:</label>
+                <input type="text" id="sms" name="sms" placeholder="'+97798XXXXXXXX'">
+            
             <label for="sub">Subscription Type:</label>
                 <select id="sub" name="sub">
                     <option value="email">Email</option>

@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<br><br><br>
+<br><br>
+<center>
+    <marquee scrollamount="15">Welcome to homepage. You can search price history in this page with ticker symbol and period.</marquee>
+</center>
+<br><br>
     <h2>Enter the ticker symbol and period</h2>
     <form method="POST" action="{{ url_for('indexpage') }}">
         <label for="tickerSymbol">Ticker Symbol:</label>
@@ -21,8 +25,9 @@
         </select>
         <input type="submit">
     </form>
-    <br><br><br>
+    <br><br>
 
+    <hr><br><br>
         <h2>{{ info.longName }}</h2>
         <p>Symbol: {{ info.symbol }}</p>
         <p>Current Price: {{ info.currentPrice }}</p>
