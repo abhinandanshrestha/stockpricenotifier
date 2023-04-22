@@ -7,7 +7,7 @@
         <br>
         <form method="POST" action="{{ url_for('process_form') }}">
             <label for="tickerSymbol">Ticker Symbol:</label>
-            <input type="text" id="tickerSymbol" name="tickerSymbol">
+            <input type="text" id="tickerSymbol" name="tickerSymbol" placeholder="MSFT,META,^GSPC.. etc.">
 
             <label for="checkFrequency">How frequently to check for price changes?:</label>
                 <select id="period" name="period">

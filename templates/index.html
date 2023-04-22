@@ -9,7 +9,7 @@
     <h2>Enter the ticker symbol and period</h2>
     <form method="POST" action="{{ url_for('indexpage') }}">
         <label for="tickerSymbol">Ticker Symbol:</label>
-        <input type="text" id="tickerSymbol" name="tickerSymbol">
+        <input type="text" id="tickerSymbol" name="tickerSymbol" placeholder="MSFT,META,^GSPC.. etc.">
 
         <label for="period">Period:</label>
         <select id="period" name="period">

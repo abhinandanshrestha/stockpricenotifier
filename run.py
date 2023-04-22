@@ -119,7 +119,7 @@ def process_form():
     thread = threading.Thread(target=background_thread)
     thread.start()
 
-    return 'Your Subscription has been accepted'
+    return render_template('success.html')
 
 # Function to check if the price of stock has crossed the threshold
 def check():
