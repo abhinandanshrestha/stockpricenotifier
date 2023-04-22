@@ -69,7 +69,7 @@ def sendSms():
 
     print(message.sid+" Message sent")
 
-
+# Route handlers
 @app.route('/')
 def index():
     # gspc=yf.Ticker("MSFT")
@@ -121,6 +121,7 @@ def process_form():
 
     return 'Your Subscription has been accepted'
 
+# Function to check if the price of stock has crossed the threshold
 def check():
     if gspc_1.info['currentPrice'] > float(ask_threshold):
         print('Increased')
