@@ -1,17 +1,73 @@
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request,redirect
 import yfinance as yf
 import time
+import threading
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import config
 
 app = Flask(__name__)
 
+# for index page
+gspc = yf.Ticker("META")
+period_="1mo"
+
+# for subscription
+gspc_1 = yf.Ticker("MSFT")
+checkFrequency=2
+ask_threshold=99999
+sub=''
+
+def sendMail():
+    # Set up the email parameters
+    sender = 'shtabhi@gmail.com'
+    receiver = 'pubjeegamer@gmail.com'
+    password = config.PASSWORD
+    subject = 'Email regarding increase in price of stock beyong your stated Threshold'
+
+    # Create a message object
+    message = MIMEMultipart()
+    message['From'] = sender
+    message['To'] = receiver
+    message['Subject'] = subject
+
+    # Add the message body
+    body = 'Current Price of your stock has reached '+ str(gspc_1.info['currentPrice'])
+    message.attach(MIMEText(body, 'plain'))
+
+    # Create the SMTP server
+    smtp_server = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp_server.starttls()
+
+    # Login to the SMTP server
+    smtp_server.login(sender, password)
+
+    # Send the email
+    smtp_server.sendmail(sender, receiver, message.as_string())
+
+    # Close the SMTP server
+    smtp_server.quit()
+
+def sendSms():
+    pass
+
 @app.route('/')
 def index():
-    gspc = yf.Ticker("^GSPC")
     # gspc=yf.Ticker("MSFT")
     info = gspc.info
-    history = gspc.history(period="1mo")
-    print(info)
+    history = gspc.history(period=period_)
+    # print(info)
     return render_template('index.html',info=info,history=history)
+
+@app.route('/indexpage', methods=['POST'])
+def indexpage():
+    ticker_symbol = request.form['tickerSymbol']
+    global period_
+    period_ = request.form['period']
+    global gspc
+    gspc = yf.Ticker(ticker_symbol)
+    return redirect('/')
 
 # handle form
 @app.route('/form')
@@ -21,20 +77,44 @@ def form():
 @app.route('/process_form', methods=['POST'])
 def process_form():
     ticker_symbol = request.form['tickerSymbol']
-    pd = request.form['period']
+    # period_ = request.form['period']
 
-    checkFrequency = request.form['checkFrequency']
+    global checkFrequency
+    checkFrequency = request.form['period']
+    print(int(checkFrequency))
+
+    global ask_threshold
     ask_threshold=request.form['ask']
-    bid_threshold=request.form['bid']
 
+    global gspc_1
     gspc_1 = yf.Ticker(ticker_symbol)
-    # gspc=yf.Ticker("MSFT")
-    info_1 = gspc_1.info
-    history_1 = gspc_1.history(pd)
-    
-    # do something with the data
-    # return 'Received form data: ticker symbol={}, period={}, freq={}, ask_threshold={}, bid_threshold={}'.format(ticker_symbol, period,checkFrequency,ask_threshold,bid_threshold)
-    return render_template('index.html',info=info_1,history=history_1)
+
+    global sub
+    sub=request.form['sub']
+
+    thread = threading.Thread(target=background_thread)
+    thread.start()
+
+    return 'Your Subscription has been accepted'
+
+def check():
+    if gspc_1.info['currentPrice'] > float(ask_threshold):
+        print('Increased')
+        if sub=='email':
+            sendMail()
+        elif sub=='sms':
+            sendSms()
+        else:
+            print('error')
+    elif gspc_1.info['currentPrice'] < float(ask_threshold):
+        print('decreased')
+    else:
+        print('stable')
+
+def background_thread():
+    while True:
+        check()
+        time.sleep(int(checkFrequency))  # Call the function every t seconds
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)     
