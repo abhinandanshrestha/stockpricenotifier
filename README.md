@@ -14,3 +14,5 @@ Once all packages has been installed, run:
 Screenshot of the UI:
 ![Alt Text](img/home.PNG)
 ![Alt Text](img/form.PNG)
+![Alt Text](img/email.PNG)
+![Alt Text](img/sms.PNG)
