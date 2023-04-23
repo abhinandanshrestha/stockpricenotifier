@@ -1,4 +1,4 @@
-# stockpricenotifier
+# YAHOO STOCK PRICE NOTIFIER
 This project was created as a part of Challenge Project for Genese Hiring Process. The application is developed using Python/Flask. 
 
 Using this application:
@@ -15,4 +15,4 @@ Screenshot of the UI:
 ![Alt Text](img/home.PNG)
 ![Alt Text](img/form.PNG)
 ![Alt Text](img/email.PNG)
-![Alt Text](img/sms.PNG)
+![Alt Text](img/sms.jpg)
