@@ -11,7 +11,7 @@ from twilio.rest import Client
 app = Flask(__name__)
 
 # Define initial parameters for index page
-gspc = yf.Ticker("META")
+gspc = yf.Ticker("MSFT")
 period_="1mo"
 
 # Define initial parameters for subscription
