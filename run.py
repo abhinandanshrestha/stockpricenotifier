@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect
+from flask import Flask, render_template,request,redirect,url_for
 import yfinance as yf
 import time
 import threading
@@ -10,20 +10,8 @@ from twilio.rest import Client
 
 app = Flask(__name__)
 
-# Define initial parameters for index page
-gspc = yf.Ticker("META")
-period_="1mo"
-
-# Define initial parameters for subscription
-gspc_1 = yf.Ticker("MSFT")
-checkFrequency=2
-ask_threshold=99999
-sub=''
-email=''
-sms=''
-
 # Function to handle sending email once currentPrice exceeds a threshold
-def sendMail():
+def sendMail(email):
     # Set up the email parameters
     sender = 'shtabhi@gmail.com'
     receiver = email
@@ -55,7 +43,7 @@ def sendMail():
 
 
 # Function to handle sending sms once currentPrice exceeds a threshold
-def sendSms():
+def sendSms(sms):
     account_sid = config.account_sid
     auth_token = config.auth_token
     client = Client(account_sid, auth_token)
@@ -72,6 +60,9 @@ def sendSms():
 # Route handlers
 @app.route('/')
 def index():
+    # Define initial parameters for index page
+    gspc = yf.Ticker("META")
+    period_="5d"
     # gspc=yf.Ticker("MSFT")
     info = gspc.info
     history = gspc.history(period=period_)
@@ -81,11 +72,15 @@ def index():
 @app.route('/indexpage', methods=['POST'])
 def indexpage():
     ticker_symbol = request.form['tickerSymbol']
-    global period_
     period_ = request.form['period']
-    global gspc
-    gspc = yf.Ticker(ticker_symbol)
-    return redirect('/')
+    return redirect(url_for('tickerData', symbol=ticker_symbol, period=period_))
+
+@app.route('/<symbol>/<period>')
+def tickerData(symbol, period):
+    gspc = yf.Ticker(symbol)
+    info = gspc.info
+    history = gspc.history(period=period)
+    return render_template('index.html', info=info, history=history)
 
 # handle form
 @app.route('/form')
@@ -95,40 +90,25 @@ def form():
 @app.route('/process_form', methods=['POST'])
 def process_form():
     ticker_symbol = request.form['tickerSymbol']
-    # period_ = request.form['period']
-
-    global checkFrequency
     checkFrequency = request.form['period']
-    print(int(checkFrequency))
-
-    global ask_threshold
     ask_threshold=request.form['ask']
-
-    global gspc_1
     gspc_1 = yf.Ticker(ticker_symbol)
-
-    global sub
     sub=request.form['sub']
-
-    global sms
     sms=request.form['sms']
-
-    global email
     email=request.form['email']
-
-    thread = threading.Thread(target=background_thread)
+    thread = threading.Thread(target=background_thread,args=(gspc_1, checkFrequency, ask_threshold, sub, sms, email))
     thread.start()
-
     return render_template('success.html')
 
 # Function to check if the price of stock has crossed the threshold
-def check():
+def check(gspc_1, ask_threshold, sub,sms,email):
+    print(gspc_1.info['currentPrice'])
     if gspc_1.info['currentPrice'] > float(ask_threshold):
         print('Increased')
         if sub=='email':
-            sendMail()
+            sendMail(email)
         elif sub=='sms':
-            sendSms()
+            sendSms(sms)
         else:
             print('error')
     elif gspc_1.info['currentPrice'] < float(ask_threshold):
@@ -136,10 +116,10 @@ def check():
     else:
         print('stable')
 
-def background_thread():
+def background_thread(gspc_1, checkFrequency, ask_threshold, sub, sms, email):
     while True:
-        check()
+        check(gspc_1, ask_threshold, sub,sms,email)
         time.sleep(int(checkFrequency))  # Call the function every t seconds
 
 if __name__ == '__main__':
-    app.run(debug=True)     
+    app.run(debug=True,port=5002)     
