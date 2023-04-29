@@ -11,7 +11,7 @@ from twilio.rest import Client
 app = Flask(__name__)
 
 # Function to handle sending email once currentPrice exceeds a threshold
-def sendMail(email):
+def sendMail(email,reach):
     # Set up the email parameters
     sender = 'shtabhi@gmail.com'
     receiver = email
@@ -25,7 +25,7 @@ def sendMail(email):
     message['Subject'] = subject
 
     # Add the message body
-    body = 'Current Price of your stock has reached '+ str(gspc_1.info['currentPrice'])
+    body = 'Current Price of your stock has reached '+ str(reach)
     message.attach(MIMEText(body, 'plain'))
 
     # Create the SMTP server
@@ -43,14 +43,14 @@ def sendMail(email):
 
 
 # Function to handle sending sms once currentPrice exceeds a threshold
-def sendSms(sms):
+def sendSms(sms,reach):
     account_sid = config.account_sid
     auth_token = config.auth_token
     client = Client(account_sid, auth_token)
 
     message = client.messages \
                     .create(
-                        body="Stock Price Increased to ",
+                        body="Stock Price Increased to "+str(reach),
                         from_='+15672293064',
                         to=sms
                     )
@@ -106,9 +106,9 @@ def check(gspc_1, ask_threshold, sub,sms,email):
     if gspc_1.info['currentPrice'] > float(ask_threshold):
         print('Increased')
         if sub=='email':
-            sendMail(email)
+            sendMail(email,gspc_1.info['currentPrice'])
         elif sub=='sms':
-            sendSms(sms)
+            sendSms(sms,gspc_1.info['currentPrice'])
         else:
             print('error')
     elif gspc_1.info['currentPrice'] < float(ask_threshold):
